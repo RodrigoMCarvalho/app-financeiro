@@ -4,7 +4,7 @@ import { AfterContentChecked, Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { switchMap } from 'rxjs/operators';
-import { ThisReceiver } from '@angular/compiler';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-category-form',
@@ -19,6 +19,7 @@ export class CategoryFormComponent implements OnInit, AfterContentChecked {
   serverErrorMessages: string[] = null;
   submittingForm: boolean = false;
   category: Category = new Category();
+  toastr: ToastrService;
 
   constructor(
     private categoryService: CategoryService,
@@ -31,6 +32,41 @@ export class CategoryFormComponent implements OnInit, AfterContentChecked {
     this.setCurrentAction();
     this.buildCategoryForm();
     this.loadCategory();
+  }
+
+  submitForm() {
+    this.submittingForm = true;
+
+    if (this.currentAction == 'new') {
+      this.createCategory();
+    } else {
+      this.updateCategory();
+    }
+  }
+
+  private updateCategory() {
+    throw new Error('Method not implemented.');
+  }
+
+  private createCategory() {
+    const category: Category = Object.assign(new Category(), this.categoryForm.value);
+
+    this.categoryService.create(category)
+      .subscribe(
+        category => this.actionForSucccess(category),
+        error => this.actionsForError(error)
+      )
+  }
+  private actionsForError(error: any): void {
+    throw new Error('Method not implemented.');
+  }
+  private actionForSucccess(category: Category): void {
+     toastr.success("Solicitação processada com sucesso!");
+
+     // redirect/reload component page
+     this.router.navigateByUrl('categories', {skipLocationChange: true}).then(
+       () => this.router.navigate(['categories', category.id, 'edit'])
+     )
   }
 
   private setCurrentAction() {
