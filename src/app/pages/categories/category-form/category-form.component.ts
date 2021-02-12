@@ -19,13 +19,13 @@ export class CategoryFormComponent implements OnInit, AfterContentChecked {
   serverErrorMessages: string[] = null;
   submittingForm: boolean = false;
   category: Category = new Category();
-  toastr: ToastrService;
 
   constructor(
     private categoryService: CategoryService,
     private route: ActivatedRoute,
     private router: Router,
-    private formBuilder: FormBuilder
+    private formBuilder: FormBuilder,
+    private toastr: ToastrService
   ) { }
 
   ngOnInit(): void {
@@ -44,10 +44,6 @@ export class CategoryFormComponent implements OnInit, AfterContentChecked {
     }
   }
 
-  private updateCategory() {
-    throw new Error('Method not implemented.');
-  }
-
   private createCategory() {
     const category: Category = Object.assign(new Category(), this.categoryForm.value);
 
@@ -57,11 +53,31 @@ export class CategoryFormComponent implements OnInit, AfterContentChecked {
         error => this.actionsForError(error)
       )
   }
+
+  private updateCategory() {
+    const category: Category = Object.assign(new Category(), this.categoryForm.value);
+
+    this.categoryService.update(category)
+      .subscribe(
+        category => this.actionForSucccess(category),
+        error => this.actionsForError(error)
+      )
+  }
+
   private actionsForError(error: any): void {
-    throw new Error('Method not implemented.');
+    this.toastr.error("Ocorreu um erro ao processar a sua solitação!");
+
+    this.submittingForm = false;
+
+    if (error.status === 422) {
+      this.serverErrorMessages = JSON.parse(error._body).errors;
+      // Ex: ["Nome já existe", "Email já cadastrado"]
+    } else {
+      this.serverErrorMessages = ["Falha na comunicação com o servidor. Tente mais tarde."];
+    }
   }
   private actionForSucccess(category: Category): void {
-     toastr.success("Solicitação processada com sucesso!");
+    this.toastr.success("Solicitação processada com sucesso!");
 
      // redirect/reload component page
      this.router.navigateByUrl('categories', {skipLocationChange: true}).then(
@@ -108,7 +124,7 @@ export class CategoryFormComponent implements OnInit, AfterContentChecked {
     if (this.currentAction == 'new') {
       this.pageTitle = 'Cadastrador de Nova Categoria'
     } else {
-        const categoryName = this.category.name;
+        const categoryName = this.category.name || "";
         this.pageTitle = 'Editando Categoria: ' + categoryName;
     }
   }
