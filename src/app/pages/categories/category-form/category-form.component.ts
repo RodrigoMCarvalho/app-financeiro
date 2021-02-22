@@ -71,7 +71,7 @@ export class CategoryFormComponent implements OnInit, AfterContentChecked {
 
     if (error.status === 422) {
       this.serverErrorMessages = JSON.parse(error._body).errors;
-      // Ex: ["Nome já existe", "Email já cadastrado"]
+      // Ex: formato ["Nome já existe", "Email já cadastrado"]
     } else {
       this.serverErrorMessages = ["Falha na comunicação com o servidor. Tente mais tarde."];
     }
