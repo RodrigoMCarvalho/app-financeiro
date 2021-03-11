@@ -29,6 +29,20 @@ export class EntryFormComponent implements OnInit, AfterContentChecked {
     radix: ','
   }
 
+  ptBR = {
+    firstDayOfWeek: 0,
+    dayNames: ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'],
+    dayNamesShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'],
+    dayNamesMin: ['Do', 'Se', 'Te', 'Qu', 'Qu', 'Se', 'Sa'],
+    monthNames: [
+      'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho',
+      'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+    ],
+    monthNamesShort: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+    today: 'Hoje',
+    clear: 'Limpar'
+  }
+
   constructor(
     private entryService: EntryService,
     private route: ActivatedRoute,
@@ -85,6 +99,7 @@ export class EntryFormComponent implements OnInit, AfterContentChecked {
       this.serverErrorMessages = ["Falha na comunicação com o servidor. Tente mais tarde."];
     }
   }
+
   private actionForSucccess(entry: Entry): void {
     this.toastr.success("Solicitação processada com sucesso!");
 
