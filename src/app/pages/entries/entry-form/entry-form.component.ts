@@ -1,3 +1,4 @@
+import { CategoryService } from './../../categories/shared/category.service';
 import { Entry } from './../shared/entry.module';
 import { EntryService } from './../shared/entry.service';
 import { AfterContentChecked, Component, OnInit } from '@angular/core';
@@ -5,6 +6,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { switchMap } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
+import { Category } from '../../categories/shared/category.model';
 
 @Component({
   selector: 'app-entry-form',
@@ -19,6 +21,7 @@ export class EntryFormComponent implements OnInit, AfterContentChecked {
   serverErrorMessages: string[] = null;
   submittingForm: boolean = false;
   entry: Entry = new Entry();
+  categories: Array<Category>;
 
   imaskConfig = {
     mask: Number,
@@ -48,13 +51,26 @@ export class EntryFormComponent implements OnInit, AfterContentChecked {
     private route: ActivatedRoute,
     private router: Router,
     private formBuilder: FormBuilder,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private categoryService: CategoryService
   ) { }
 
   ngOnInit(): void {
     this.setCurrentAction();
     this.buildEntryForm();
     this.loadEntry();
+    this.loadCategories();
+  }
+
+  getTipeOptions(): Array<any> {
+    return Object.entries(Entry.types).map(
+      ([value, text]) => {
+        return {
+          value: value,
+          text: text
+        }
+      }
+    )
   }
 
   submitForm() {
@@ -122,7 +138,7 @@ export class EntryFormComponent implements OnInit, AfterContentChecked {
       id: [null],
       name: [null, [Validators.required, Validators.minLength(2)]],
       description: [null],
-      type: [null, [Validators.required]],
+      type: ["expense", [Validators.required]],
       amount: [null, [Validators.required]],
       date: [null, [Validators.required]],
       paid: [true, [Validators.required]],
@@ -156,6 +172,12 @@ export class EntryFormComponent implements OnInit, AfterContentChecked {
         const entryName = this.entry.name || "";
         this.pageTitle = 'Editando Lançamento: ' + entryName;
     }
+  }
+
+  private loadCategories() {
+    this.categoryService.getAll().subscribe(
+      categories => this.categories = categories
+    );
   }
 
 }
